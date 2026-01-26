@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/services/prisma.service";
-import { SecretResponse } from "../dtos/get-secret.dto";
+import { SecretResponse } from "../dtos";
 
 @Injectable()
 export class SecretService {

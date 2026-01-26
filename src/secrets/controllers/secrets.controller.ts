@@ -8,7 +8,7 @@ import {
   Req,
 } from "@nestjs/common";
 import { SecretService } from "../services/secrets.service";
-import { CreateSecret } from "../dtos/createSecret";
+import { CreateSecret } from "../dtos";
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
