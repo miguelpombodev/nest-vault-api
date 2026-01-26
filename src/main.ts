@@ -32,15 +32,24 @@ async function bootstrap() {
     .setDescription("Digital Vault system for secrets and attachments")
     .setVersion("1.0")
     .addTag("Vault")
-    .addApiKey(
+    // .addApiKey(
+    //   {
+    //     type: "apiKey",
+    //     name: "x-vault-key",
+    //     in: "header",
+    //   },
+    //   "x-vault-key",
+    // )
+    .addBearerAuth(
       {
-        type: "apiKey",
-        name: "x-vault-key",
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        name: "JWT",
         in: "header",
       },
-      "x-vault-key",
+      "access_token",
     )
-    // .addBearerAuth()
     .build();
 
   const swaggerDocument = SwaggerModule.createDocument(app, config);

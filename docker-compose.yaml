@@ -13,6 +13,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - vault_net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -28,6 +30,8 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - vault_net
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -47,8 +51,14 @@ services:
       - "10000:10000" # Blob
       - "10001:10001" # Queue
       - "10002:10002" # Table
+    networks:
+      - vault_net
     volumes:
       - azurite_data:/data
+
+networks:
+  vault_net:
+    driver: bridge
 
 volumes:
   postgres_data:
