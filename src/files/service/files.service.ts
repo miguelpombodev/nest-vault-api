@@ -2,6 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "src/prisma/services/prisma.service";
 import { StorageService } from "src/providers/storage/storage";
 import { SaveSecretFileDTO } from "../dtos/responses";
+import { SecretFile } from "@prisma/client";
 
 @Injectable()
 export class FilesService {
@@ -34,6 +35,49 @@ export class FilesService {
     );
 
     return entityId;
+  }
+
+  async deleteOneFileAsync(fileId: string): Promise<string | null> {
+    const getFileDataResult = await this.getOneFileDataByIdInDatabase(fileId);
+
+    if (!getFileDataResult) {
+      return null;
+    }
+
+    const containerClient = await this.storageService.getContainerClient();
+    await this.storageService.deleteInStorage(
+      containerClient,
+      getFileDataResult.filename,
+    );
+
+    await this.deleteOneFileByIdFromDatabase(fileId);
+
+    return "success";
+  }
+
+  private async getOneFileDataByIdInDatabase(
+    fileId: string,
+  ): Promise<SecretFile | null> {
+    const file = this.prismaService.secretFile.findFirst({
+      where: {
+        id: fileId,
+      },
+    });
+
+    return file;
+  }
+
+  private async deleteOneFileByIdFromDatabase(fileId: string): Promise<void> {
+    await this.prismaService.secretFile.delete({
+      where: {
+        id: fileId,
+      },
+    });
+
+    this.logger.log(
+      `File with Id ${fileId} has been deleted from database`,
+      FilesService.name,
+    );
   }
 
   private async saveFileDataInDatabase(

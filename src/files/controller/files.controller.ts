@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   HttpStatus,
+  Param,
   Post,
   Req,
   Res,
@@ -66,5 +68,22 @@ export class FilesController {
     await this.filesService.saveFileAsync(file, userId);
 
     return response.status(HttpStatus.CREATED).send();
+  }
+
+  @Delete("delete/{:fileId}")
+  async deleteOneSecretFileAsync(
+    @Res() response: Response,
+    @Param("fileId") fileId: string,
+  ) {
+    const tryToDeleteFileFromStorage =
+      await this.filesService.deleteOneFileAsync(fileId);
+
+    if (!tryToDeleteFileFromStorage) {
+      return response.status(HttpStatus.CONFLICT).send({
+        detail: "Something went wrong trying to delete the requested file",
+      });
+    }
+
+    return response.send({ detail: "File deleted successfully" });
   }
 }

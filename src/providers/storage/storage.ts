@@ -4,7 +4,7 @@ import {
   ContainerCreateOptions,
   StorageSharedKeyCredential,
 } from "@azure/storage-blob";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { SaveSecretFileDTO } from "src/files/dtos/responses";
 
@@ -18,7 +18,10 @@ export class StorageService {
     access: "container",
   };
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly logger: Logger,
+  ) {
     const account = this.configService.get<string>("AZURE_STORAGE_ACCOUNT")!;
     const accountKey = this.configService.get<string>("AZURE_STORAGE_KEY")!;
     const endpoint = this.configService.get<string>(
@@ -57,6 +60,37 @@ export class StorageService {
       },
     });
 
+    this.logger.log(
+      `A file called ${file.Name} was uploaded in a container called ${blobClient.containerName}`,
+      StorageService.name,
+    );
+
     return blobClient.url;
+  }
+
+  async deleteInStorage(
+    client: ContainerClient,
+    fileName: string,
+  ): Promise<number | null> {
+    const file = client.getBlobClient(fileName);
+
+    if (!file) {
+      this.logger.error(
+        `There was a attempt to delete a file called ${fileName}, however it was not founded.`,
+        StorageService.name,
+      );
+      return null;
+    }
+
+    const deleteFromStorageResult = await file.delete({
+      deleteSnapshots: "include",
+    });
+
+    this.logger.log(
+      `A file called ${fileName} was deleted from container called ${file.containerName}`,
+      StorageService.name,
+    );
+
+    return deleteFromStorageResult._response.status;
   }
 }
