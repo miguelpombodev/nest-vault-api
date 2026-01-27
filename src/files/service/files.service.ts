@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "src/prisma/services/prisma.service";
 import { StorageService } from "src/providers/storage/storage";
 import { SaveSecretFileDTO } from "../dtos/responses";
@@ -8,6 +8,7 @@ export class FilesService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly storageService: StorageService,
+    private readonly logger: Logger,
   ) {}
 
   async saveFileAsync(
@@ -20,8 +21,17 @@ export class FilesService {
       containerClient,
       file,
     );
+    this.logger.log(
+      `File ${file.Name} from user ${userId} has been upload in storage`,
+      FilesService.name,
+    );
 
     const entityId = await this.saveFileDataInDatabase(file, userId, fileUrl);
+
+    this.logger.log(
+      `File ${file.Name} from user ${userId} has been registered in database`,
+      FilesService.name,
+    );
 
     return entityId;
   }

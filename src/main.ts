@@ -5,10 +5,15 @@ import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const logger = new Logger("Bootstrap");
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
+  const logger = app.get(Logger);
 
   // Set API prefix
   app.setGlobalPrefix("api/v1");
@@ -32,14 +37,6 @@ async function bootstrap() {
     .setDescription("Digital Vault system for secrets and attachments")
     .setVersion("1.0")
     .addTag("Vault")
-    // .addApiKey(
-    //   {
-    //     type: "apiKey",
-    //     name: "x-vault-key",
-    //     in: "header",
-    //   },
-    //   "x-vault-key",
-    // )
     .addBearerAuth(
       {
         type: "http",
@@ -58,8 +55,11 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port);
 
-  logger.log(`Application is running on: http://localhost:${port}/api/v1`);
-  logger.log(`Swagger documentation: http://localhost:${port}/docs`);
+  logger.log(
+    "info",
+    `Application is running on: http://localhost:${port}/api/v1`,
+  );
+  logger.log("info", `Swagger documentation: http://localhost:${port}/docs`);
 }
 
 bootstrap().catch((err) => {
