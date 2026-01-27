@@ -13,13 +13,11 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiSecurity,
 } from "@nestjs/swagger";
 import { JwtAuthGuard } from "src/guards/jwt/jwt.guard";
 import { Request } from "express";
 
 @Controller("secrets")
-@ApiSecurity("x-vault-key")
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth("access_token")
 export class SecretController {
@@ -33,7 +31,7 @@ export class SecretController {
     return this.SecretService.getSecrets(userId);
   }
 
-  @Post("create")
+  @Post("save")
   @ApiCreatedResponse()
   @HttpCode(201)
   async createSecret(@Req() request: Request, @Body() body: CreateSecret) {
