@@ -38,11 +38,4 @@ export class SecretController {
     const { userId } = request.user!;
     return this.SecretService.saveSecret(body.title, body.secret, userId);
   }
-
-  //   @Post('upload')
-  //   async uploadAttachment(@Body() body: { name: string; content: string }) {
-  //     // Simulando um arquivo vindo de uma string Base64 ou texto
-  //     const buffer = Buffer.from(body.content, 'utf-8');
-  //     return await this.SecretService.saveFile(body.name, buffer);
-  //   }
 }
