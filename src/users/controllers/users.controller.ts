@@ -3,36 +3,32 @@ import {
   Controller,
   Get,
   HttpStatus,
-  Param,
   Post,
+  Req,
   Res,
   UseGuards,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
-import { ApiOkResponse, ApiParam } from "@nestjs/swagger";
-import { Response } from "express";
+import { ApiBearerAuth, ApiOkResponse } from "@nestjs/swagger";
+import { Response, Request } from "express";
 import { UserResponse } from "../dtos/user-response.dto";
 import { CreateUserDto } from "../dtos/create-user.dto";
 import { JwtAuthGuard } from "src/guards/jwt/jwt.guard";
 
 @Controller("users")
-@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UserService) {}
 
-  @Get(":id")
+  @Get()
+  @ApiBearerAuth("access_token")
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: UserResponse })
-  @ApiParam({
-    name: "id",
-    description: "The ID of the user",
-    type: String,
-    required: true,
-  })
   async getOneUser(
+    @Req() request: Request,
     @Res() response: Response,
-    @Param("id") id: string,
   ): Promise<Response> {
-    const user = await this.usersService.getOneUserById(id);
+    const { userId } = request.user!;
+    const user = await this.usersService.getOneUserById(userId);
 
     if (!user) {
       response
@@ -43,7 +39,7 @@ export class UsersController {
     return response.status(HttpStatus.OK).send(user);
   }
 
-  @Post(":id")
+  @Post()
   @ApiOkResponse()
   async saveUser(@Res() response: Response, @Body() body: CreateUserDto) {
     const checkUser = await this.usersService.getOneUserByEmail(body.email);
