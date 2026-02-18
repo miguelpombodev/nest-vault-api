@@ -51,7 +51,7 @@ export class StorageService {
     client: ContainerClient,
     file: SaveSecretFileDTO,
   ): Promise<string> {
-    const blobClient = client.getBlockBlobClient(file.Name);
+    const blobClient = client.getBlockBlobClient(file.FolderPath);
 
     await blobClient.uploadData(file.Buffer, {
       blobHTTPHeaders: {
