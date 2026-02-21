@@ -1,3 +1,8 @@
+# this file does not have SMTP user and password for obvious reasons. If there are any changes to be made in this file
+# please, after sending the new changes, untrack this file in git, doing:
+# 1 - Put this file in gitignore again
+# 2- Run the git command - 'git update-index --assume-unchaged email-service.yml'
+
 services:
   email_sender:
     image: wallghost/email-sender-subscriber:latest
