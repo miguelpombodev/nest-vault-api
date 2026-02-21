@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 
 services:
   postgres:
@@ -73,8 +73,9 @@ services:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin123
   email_sender:
-    image: wallghost/email-sender-subscriber:latest
-    container_name: email_sender
+    extends:
+      service: email_sender
+      file: email-service.yml
     networks:
       - vault_net
     restart: on-failure
