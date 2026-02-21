@@ -1,5 +1,5 @@
-# # Stoping tracking email sender service
-# email-service.yml
+# Stoping tracking email sender service
+email-service.yml
 
 /volumes
 
